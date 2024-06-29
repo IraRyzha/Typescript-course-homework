@@ -1,0 +1,14 @@
+{
+  "name": "typescript-course-homework",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "tsc index.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "typescript": "^5.5.2"
+  }
+}
