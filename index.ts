@@ -1,13 +1,13 @@
 class School {
   _directions: TDirection[] = [];
 
-  addDirection(direction: TDirection) {
+  addDirection(direction: TDirection): void {
     this._directions.push(direction);
   }
 }
 
 type TDirection = {
-  _name: string;
+  name: string;
   levels: TLevel[];
   addLevel: (level: TLevel) => void;
 };
@@ -20,18 +20,18 @@ class Direction {
     this._name = name;
   }
 
-  get name() {
+  get name(): string {
     return this._name;
   }
 
-  addLevel(level: TLevel) {
+  addLevel(level: TLevel): void {
     this.levels.push(level);
   }
 }
 
 type TLevel = {
-  _name: string;
-  _program: string;
+  name: string;
+  program: string;
   groups: TGroup[];
 };
 
@@ -45,21 +45,21 @@ class Level {
     this._program = program;
   }
 
-  get name() {
+  get name(): string {
     return this._name;
   }
 
-  get program() {
+  get program(): string {
     return this._program;
   }
 
-  addGroup(group: TGroup) {
+  addGroup(group: TGroup): void {
     this.groups.push(group);
   }
 }
 
 type TGroup = {
-  _students: TStudent[];
+  students: TStudent[];
   directionName: string;
   levelName: string;
   addStudent: (student: TStudent) => void;
@@ -71,7 +71,7 @@ class Group {
   directionName: string;
   levelName: string;
 
-  get students() {
+  get students(): TStudent[] {
     return this._students;
   }
 
@@ -80,11 +80,11 @@ class Group {
     this.levelName = levelName;
   }
 
-  addStudent(student: TStudent) {
+  addStudent(student: TStudent): void {
     this._students.push(student);
   }
 
-  showPerformance() {
+  showPerformance(): TStudent[] {
     const sortedStudents = this.students.sort(
       (a, b) => b.getPerformanceRating() - a.getPerformanceRating()
     );
@@ -94,10 +94,10 @@ class Group {
 }
 
 type TStudent = {
-  _firstName: string;
-  _lastName: string;
-  _birthYear: number;
-  _grades: any;
+  firstName: string;
+  lastName: string;
+  birthYear: number;
+  grades: any;
   attendance: boolean[];
   setGrade: (subject: string, grade: number) => void;
   markAttendance: (present: boolean) => void;
@@ -117,7 +117,7 @@ class Student {
     this._birthYear = birthYear;
   }
 
-  get fullName() {
+  get fullName(): string {
     return `${this._lastName} ${this._firstName}`;
   }
 
@@ -125,19 +125,19 @@ class Student {
     [this._lastName, this._firstName] = value.split(" ");
   }
 
-  get age() {
+  get age(): number {
     return new Date().getFullYear() - this._birthYear;
   }
 
-  setGrade(subject: string, grade: number) {
+  setGrade(subject: string, grade: number): void {
     this._grades[subject] = grade;
   }
 
-  markAttendance(present: boolean) {
+  markAttendance(present: boolean): void {
     this.attendance.push(present);
   }
 
-  getPerformanceRating() {
+  getPerformanceRating(): number {
     const gradeValues: number[] = Object.values(this._grades);
 
     console.log("gradeValues");
