@@ -1,115 +1,158 @@
 class School {
-  _directions: TDirection[] = [];
+  _areas: string[];
+  _lecturers: TLecturer[];
 
-  addDirection(direction: TDirection): void {
-    this._directions.push(direction);
+  get areas() {
+    return this._areas;
+  }
+
+  get lecturers() {
+    return this._lecturers;
+  }
+
+  addArea(addedArea: string): void {
+    this._areas.push(addedArea);
+  }
+
+  removeArea(removedArea: string): void {
+    this._areas.filter((area) => area != removedArea);
+  }
+
+  addLecturer(addedLecturer: TLecturer): void {
+    this._lecturers.push(addedLecturer);
+  }
+
+  removeLecturer(removedLecturer: TLecturer): void {
+    this._lecturers.filter((lecturer) => lecturer != removedLecturer);
   }
 }
 
-type TDirection = {
+type TLecturer = {
   name: string;
-  levels: TLevel[];
-  addLevel: (level: TLevel) => void;
+  surname: string;
+  position: string;
+  company: string;
+  experience: number;
+  courses: string;
+  contacts: string;
 };
 
-class Direction {
+class Area {
   _name: string;
-  levels: TLevel[] = [];
+  _levels: string[];
 
   constructor(name: string) {
     this._name = name;
   }
 
-  get name(): string {
+  get areas() {
     return this._name;
   }
 
-  addLevel(level: TLevel): void {
-    this.levels.push(level);
+  get lecturers() {
+    return this._levels;
+  }
+
+  addLevel(addedLevel: string): void {
+    this._levels.push(addedLevel);
+  }
+
+  removeLevel(removedLevel: string): void {
+    this._levels.filter((level) => level != removedLevel);
   }
 }
-
-type TLevel = {
-  name: string;
-  program: string;
-  groups: TGroup[];
-};
 
 class Level {
   _name: string;
-  _program: string;
-  groups: TGroup[] = [];
+  _description: string;
+  _groups: string[];
 
-  constructor(name: string, program: string) {
+  constructor(name: string, description: string) {
     this._name = name;
-    this._program = program;
+    this._description = description;
   }
 
-  get name(): string {
+  get name() {
     return this._name;
   }
 
-  get program(): string {
-    return this._program;
+  get description() {
+    return this._description;
   }
 
-  addGroup(group: TGroup): void {
-    this.groups.push(group);
+  get groups() {
+    return this._groups;
+  }
+
+  addGroup(addedGroup: string): void {
+    this._groups.push(addedGroup);
+  }
+
+  removeGroup(removedGroup: string): void {
+    this._groups.filter((level) => level != removedGroup);
   }
 }
 
-type TGroup = {
-  students: TStudent[];
-  directionName: string;
-  levelName: string;
-  addStudent: (student: TStudent) => void;
-  showPerformance: () => TStudent[];
-};
-
 class Group {
-  _students: TStudent[] = [];
-  directionName: string;
-  levelName: string;
+  _area: string;
+  _status: string;
+  _students: string[]; // Modify the array so that it has a valid toSorted method*
+  _directionName: string;
+  _levelName: string;
 
-  get students(): TStudent[] {
+  constructor(directionName: string, levelName: string) {
+    this._directionName = directionName;
+    this._levelName = levelName;
+  }
+
+  get area() {
+    return this._area;
+  }
+
+  get status() {
+    return this._status;
+  }
+
+  get students() {
     return this._students;
   }
 
-  constructor(directionName: string, levelName: string) {
-    this.directionName = directionName;
-    this.levelName = levelName;
+  get directionName() {
+    return this._directionName;
   }
 
-  addStudent(student: TStudent): void {
-    this._students.push(student);
+  get levelName() {
+    return this._levelName;
   }
 
-  showPerformance(): TStudent[] {
-    const sortedStudents = this.students.sort(
-      (a, b) => b.getPerformanceRating() - a.getPerformanceRating()
-    );
-
-    return sortedStudents;
+  addStudent(addedStudent: string): void {
+    this._students.push(addedStudent);
   }
+
+  removeStudent(removedStudent: string): void {
+    this._students.filter((level) => level != removedStudent);
+  }
+
+  setStatus(status: string): void {
+    this._status = status;
+  }
+
+  // showPerformance() {
+  //   const sortedStudents = this._students.toSorted(
+  //     (a, b) => b.getPerformanceRating() - a.getPerformanceRating()
+  //   );
+  //   return sortedStudents;
+  // }
 }
 
-type TStudent = {
-  firstName: string;
-  lastName: string;
-  birthYear: number;
-  grades: any;
-  attendance: boolean[];
-  setGrade: (subject: string, grade: number) => void;
-  markAttendance: (present: boolean) => void;
-  getPerformanceRating: () => number;
-};
-
 class Student {
+  // implement 'set grade' and 'set visit' methods
+
   _firstName: string;
   _lastName: string;
   _birthYear: number;
-  _grades: any = {};
-  attendance: boolean[] = [];
+  _grades: object[];
+  _visits: object[];
 
   constructor(firstName: string, lastName: string, birthYear: number) {
     this._firstName = firstName;
@@ -117,7 +160,7 @@ class Student {
     this._birthYear = birthYear;
   }
 
-  get fullName(): string {
+  get fullName() {
     return `${this._lastName} ${this._firstName}`;
   }
 
@@ -125,31 +168,29 @@ class Student {
     [this._lastName, this._firstName] = value.split(" ");
   }
 
-  get age(): number {
+  get age() {
     return new Date().getFullYear() - this._birthYear;
   }
 
-  setGrade(subject: string, grade: number): void {
-    this._grades[subject] = grade;
+  set grade({ workName: string, mark: number }) {
+    this._grades.push({ workName: string, mark: number });
   }
 
-  markAttendance(present: boolean): void {
-    this.attendance.push(present);
+  set visit({ lesson: string, isPresent: boolean }) {
+    this._visits.push({ lesson: string, isPresent: boolean });
   }
 
-  getPerformanceRating(): number {
-    const gradeValues: number[] = Object.values(this._grades);
+  // getPerformanceRating() {
+  //   const gradeValues: object[] = Object.values(this._grades.);
 
-    console.log("gradeValues");
-    console.log(gradeValues);
+  //   if (!gradeValues.length) return 0;
 
-    if (gradeValues.length === 0) return 0;
+  //   const averageGrade =
+  //     gradeValues.reduce((sum, grade) => sum + grade.mark, 0) / gradeValues.length;
+  //   const attendancePercentage =
+  //     (this._visits.filter((present) => present).length / this._visits.length) *
+  //     100;
 
-    const averageGrade =
-      gradeValues.reduce((sum, grade) => sum + grade, 0) / gradeValues.length;
-
-    return averageGrade;
-  }
+  //   return (averageGrade + attendancePercentage) / 2;
+  // }
 }
-
-export { School, Direction, Level, Group, Student };
