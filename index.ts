@@ -1,20 +1,20 @@
 class School {
-  _areas: string[];
-  _lecturers: TLecturer[];
+  _areas: TArea[] = [];
+  _lecturers: TLecturer[] = [];
 
-  get areas() {
+  get areas(): TArea[] {
     return this._areas;
   }
 
-  get lecturers() {
+  get lecturers(): TLecturer[] {
     return this._lecturers;
   }
 
-  addArea(addedArea: string): void {
+  addArea(addedArea: TArea): void {
     this._areas.push(addedArea);
   }
 
-  removeArea(removedArea: string): void {
+  removeArea(removedArea: TArea): void {
     this._areas.filter((area) => area != removedArea);
   }
 
@@ -37,66 +37,85 @@ type TLecturer = {
   contacts: string;
 };
 
+type TArea = {
+  name: string;
+  levels: TLevel[];
+};
+
 class Area {
   _name: string;
-  _levels: string[];
+  _levels: TLevel[] = [];
 
   constructor(name: string) {
     this._name = name;
   }
 
-  get areas() {
+  get name(): string {
     return this._name;
   }
 
-  get lecturers() {
+  get levels(): TLevel[] {
     return this._levels;
   }
 
-  addLevel(addedLevel: string): void {
+  addLevel(addedLevel: TLevel): void {
     this._levels.push(addedLevel);
   }
 
-  removeLevel(removedLevel: string): void {
+  removeLevel(removedLevel: TLevel): void {
     this._levels.filter((level) => level != removedLevel);
   }
 }
 
+type TLevel = {
+  name: string;
+  description: string;
+  groups: TGroup[];
+};
+
 class Level {
   _name: string;
   _description: string;
-  _groups: string[];
+  _groups: TGroup[] = [];
 
   constructor(name: string, description: string) {
     this._name = name;
     this._description = description;
   }
 
-  get name() {
+  get name(): string {
     return this._name;
   }
 
-  get description() {
+  get description(): string {
     return this._description;
   }
 
-  get groups() {
+  get groups(): TGroup[] {
     return this._groups;
   }
 
-  addGroup(addedGroup: string): void {
+  addGroup(addedGroup: TGroup): void {
     this._groups.push(addedGroup);
   }
 
-  removeGroup(removedGroup: string): void {
-    this._groups.filter((level) => level != removedGroup);
+  removeGroup(removedGroup: TGroup): void {
+    this._groups.filter((group) => group != removedGroup);
   }
 }
 
+type TGroup = {
+  area: string;
+  status: string;
+  students: TStudent[];
+  directionName: string;
+  levelName: string;
+};
+
 class Group {
-  _area: string;
-  _status: string;
-  _students: string[]; // Modify the array so that it has a valid toSorted method*
+  _area: string = "";
+  _status: string = "";
+  _students: TStudent[] = [];
   _directionName: string;
   _levelName: string;
 
@@ -105,54 +124,65 @@ class Group {
     this._levelName = levelName;
   }
 
-  get area() {
+  get area(): string {
     return this._area;
   }
 
-  get status() {
+  get status(): string {
     return this._status;
   }
 
-  get students() {
+  get students(): TStudent[] {
     return this._students;
   }
 
-  get directionName() {
+  get directionName(): string {
     return this._directionName;
   }
 
-  get levelName() {
+  get levelName(): string {
     return this._levelName;
   }
 
-  addStudent(addedStudent: string): void {
+  addStudent(addedStudent: TStudent): void {
     this._students.push(addedStudent);
   }
 
-  removeStudent(removedStudent: string): void {
-    this._students.filter((level) => level != removedStudent);
+  removeStudent(removedStudent: TStudent): void {
+    this._students.filter((student) => student != removedStudent);
   }
 
   setStatus(status: string): void {
     this._status = status;
   }
 
-  // showPerformance() {
-  //   const sortedStudents = this._students.toSorted(
-  //     (a, b) => b.getPerformanceRating() - a.getPerformanceRating()
-  //   );
-  //   return sortedStudents;
-  // }
+  showPerformance(): TStudent[] {
+    const sortedStudents = [...this._students].sort(
+      (a, b) => b.getPerformanceRating() - a.getPerformanceRating()
+    );
+
+    console.log(...this._students);
+    console.log(sortedStudents);
+
+    return sortedStudents;
+  }
 }
 
-class Student {
-  // implement 'set grade' and 'set visit' methods
-
+type TStudent = {
   _firstName: string;
   _lastName: string;
   _birthYear: number;
-  _grades: object[];
-  _visits: object[];
+  _grades: TGrade[];
+  _visits: TVisit[];
+  getPerformanceRating: () => number;
+};
+
+class Student {
+  _firstName: string;
+  _lastName: string;
+  _birthYear: number;
+  _grades: TGrade[] = [];
+  _visits: TVisit[] = [];
 
   constructor(firstName: string, lastName: string, birthYear: number) {
     this._firstName = firstName;
@@ -172,25 +202,33 @@ class Student {
     return new Date().getFullYear() - this._birthYear;
   }
 
-  set grade({ workName: string, mark: number }) {
-    this._grades.push({ workName: string, mark: number });
+  set grade(grade: TGrade) {
+    this._grades.push(grade);
   }
 
-  set visit({ lesson: string, isPresent: boolean }) {
-    this._visits.push({ lesson: string, isPresent: boolean });
+  set visit(visit: TVisit) {
+    this._visits.push(visit);
   }
 
-  // getPerformanceRating() {
-  //   const gradeValues: object[] = Object.values(this._grades.);
+  getPerformanceRating(): number {
+    if (!this._grades.length) return 0;
 
-  //   if (!gradeValues.length) return 0;
+    const averageGrade =
+      this._grades.reduce((sum, grade) => sum + grade.mark, 0) /
+      this._grades.length;
 
-  //   const averageGrade =
-  //     gradeValues.reduce((sum, grade) => sum + grade.mark, 0) / gradeValues.length;
-  //   const attendancePercentage =
-  //     (this._visits.filter((present) => present).length / this._visits.length) *
-  //     100;
-
-  //   return (averageGrade + attendancePercentage) / 2;
-  // }
+    return averageGrade;
+  }
 }
+
+type TGrade = {
+  workName: string;
+  mark: number;
+};
+
+type TVisit = {
+  lesson: string;
+  present: boolean;
+};
+
+export { School, Area, Level, Group, Student };
