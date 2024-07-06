@@ -1,8 +1,17 @@
-class School {
-  _areas: TArea[] = [];
+interface ISchool {
+  _areas: IArea[];
+  _lecturers: TLecturer[];
+  addArea(addedArea: IArea): void;
+  removeArea(removedArea: IArea): void;
+  addLecturer(addedLecturer: TLecturer): void;
+  removeLecturer(removedLecturer: TLecturer): void;
+}
+
+class School implements ISchool {
+  _areas: IArea[] = [];
   _lecturers: TLecturer[] = [];
 
-  get areas(): TArea[] {
+  get areas(): IArea[] {
     return this._areas;
   }
 
@@ -10,11 +19,11 @@ class School {
     return this._lecturers;
   }
 
-  addArea(addedArea: TArea): void {
+  addArea(addedArea: IArea): void {
     this._areas.push(addedArea);
   }
 
-  removeArea(removedArea: TArea): void {
+  removeArea(removedArea: IArea): void {
     this._areas.filter((area) => area != removedArea);
   }
 
@@ -37,14 +46,14 @@ type TLecturer = {
   contacts: string;
 };
 
-type TArea = {
+interface IArea {
   name: string;
-  levels: TLevel[];
-};
+  levels: ILevel[];
+}
 
 class Area {
   _name: string;
-  _levels: TLevel[] = [];
+  _levels: ILevel[] = [];
 
   constructor(name: string) {
     this._name = name;
@@ -54,29 +63,29 @@ class Area {
     return this._name;
   }
 
-  get levels(): TLevel[] {
+  get levels(): ILevel[] {
     return this._levels;
   }
 
-  addLevel(addedLevel: TLevel): void {
+  addLevel(addedLevel: ILevel): void {
     this._levels.push(addedLevel);
   }
 
-  removeLevel(removedLevel: TLevel): void {
+  removeLevel(removedLevel: ILevel): void {
     this._levels.filter((level) => level != removedLevel);
   }
 }
 
-type TLevel = {
+interface ILevel {
   name: string;
   description: string;
-  groups: TGroup[];
-};
+  groups: IGroup[];
+}
 
 class Level {
   _name: string;
   _description: string;
-  _groups: TGroup[] = [];
+  _groups: IGroup[] = [];
 
   constructor(name: string, description: string) {
     this._name = name;
@@ -91,31 +100,31 @@ class Level {
     return this._description;
   }
 
-  get groups(): TGroup[] {
+  get groups(): IGroup[] {
     return this._groups;
   }
 
-  addGroup(addedGroup: TGroup): void {
+  addGroup(addedGroup: IGroup): void {
     this._groups.push(addedGroup);
   }
 
-  removeGroup(removedGroup: TGroup): void {
+  removeGroup(removedGroup: IGroup): void {
     this._groups.filter((group) => group != removedGroup);
   }
 }
 
-type TGroup = {
+interface IGroup {
   area: string;
   status: string;
-  students: TStudent[];
+  students: IStudent[];
   directionName: string;
   levelName: string;
-};
+}
 
 class Group {
   _area: string = "";
   _status: string = "";
-  _students: TStudent[] = [];
+  _students: IStudent[] = [];
   _directionName: string;
   _levelName: string;
 
@@ -132,7 +141,7 @@ class Group {
     return this._status;
   }
 
-  get students(): TStudent[] {
+  get students(): IStudent[] {
     return this._students;
   }
 
@@ -144,11 +153,11 @@ class Group {
     return this._levelName;
   }
 
-  addStudent(addedStudent: TStudent): void {
+  addStudent(addedStudent: IStudent): void {
     this._students.push(addedStudent);
   }
 
-  removeStudent(removedStudent: TStudent): void {
+  removeStudent(removedStudent: IStudent): void {
     this._students.filter((student) => student != removedStudent);
   }
 
@@ -156,7 +165,7 @@ class Group {
     this._status = status;
   }
 
-  showPerformance(): TStudent[] {
+  showPerformance(): IStudent[] {
     const sortedStudents = [...this._students].sort(
       (a, b) => b.getPerformanceRating() - a.getPerformanceRating()
     );
@@ -168,14 +177,14 @@ class Group {
   }
 }
 
-type TStudent = {
+interface IStudent {
   _firstName: string;
   _lastName: string;
   _birthYear: number;
   _grades: TGrade[];
   _visits: TVisit[];
   getPerformanceRating: () => number;
-};
+}
 
 class Student {
   _firstName: string;
