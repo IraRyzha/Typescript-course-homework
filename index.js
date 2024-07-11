@@ -1,221 +1,91 @@
 "use strict";
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Student = exports.Group = exports.Level = exports.Area = exports.School = void 0;
-var School = /** @class */ (function () {
-    function School() {
-        this._areas = [];
-        this._lecturers = [];
+exports.Triangle = exports.Square = exports.Rectangle = exports.Circle = void 0;
+var Figure = /** @class */ (function () {
+    function Figure() {
     }
-    Object.defineProperty(School.prototype, "areas", {
-        get: function () {
-            return this._areas;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(School.prototype, "lecturers", {
-        get: function () {
-            return this._lecturers;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    School.prototype.addArea = function (addedArea) {
-        this._areas.push(addedArea);
-    };
-    School.prototype.removeArea = function (removedArea) {
-        this._areas.filter(function (area) { return area != removedArea; });
-    };
-    School.prototype.addLecturer = function (addedLecturer) {
-        this._lecturers.push(addedLecturer);
-    };
-    School.prototype.removeLecturer = function (removedLecturer) {
-        this._lecturers.filter(function (lecturer) { return lecturer != removedLecturer; });
-    };
-    return School;
+    return Figure;
 }());
-exports.School = School;
-var Area = /** @class */ (function () {
-    function Area(name) {
-        this._levels = [];
-        this._name = name;
+var Circle = /** @class */ (function (_super) {
+    __extends(Circle, _super);
+    function Circle(color, radius) {
+        var _this = _super.call(this) || this;
+        _this.color = color;
+        _this.radius = radius;
+        _this.name = "circle";
+        return _this;
     }
-    Object.defineProperty(Area.prototype, "name", {
-        get: function () {
-            return this._name;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Area.prototype, "levels", {
-        get: function () {
-            return this._levels;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Area.prototype.addLevel = function (addedLevel) {
-        this._levels.push(addedLevel);
+    Circle.prototype.calculateArea = function () {
+        return Math.PI * Math.pow(this.radius, 2);
     };
-    Area.prototype.removeLevel = function (removedLevel) {
-        this._levels.filter(function (level) { return level != removedLevel; });
-    };
-    return Area;
-}());
-exports.Area = Area;
-var Level = /** @class */ (function () {
-    function Level(name, description) {
-        this._groups = [];
-        this._name = name;
-        this._description = description;
+    return Circle;
+}(Figure));
+exports.Circle = Circle;
+var Rectangle = /** @class */ (function (_super) {
+    __extends(Rectangle, _super);
+    function Rectangle(color, sideLength, sideWidth) {
+        var _this = _super.call(this) || this;
+        _this.color = color;
+        _this.sideLength = sideLength;
+        _this.sideWidth = sideWidth;
+        _this.name = "rectangle";
+        return _this;
     }
-    Object.defineProperty(Level.prototype, "name", {
-        get: function () {
-            return this._name;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Level.prototype, "description", {
-        get: function () {
-            return this._description;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Level.prototype, "groups", {
-        get: function () {
-            return this._groups;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Level.prototype.addGroup = function (addedGroup) {
-        this._groups.push(addedGroup);
+    Rectangle.prototype.calculateArea = function () {
+        return (this.sideLength + this.sideWidth) * 2;
     };
-    Level.prototype.removeGroup = function (removedGroup) {
-        this._groups.filter(function (group) { return group != removedGroup; });
+    Rectangle.prototype.print = function () {
+        console.log("(a + b) * 2");
     };
-    return Level;
-}());
-exports.Level = Level;
-var Group = /** @class */ (function () {
-    function Group(directionName, levelName) {
-        this._area = "";
-        this._status = "";
-        this._students = [];
-        this._directionName = directionName;
-        this._levelName = levelName;
+    return Rectangle;
+}(Figure));
+exports.Rectangle = Rectangle;
+var Square = /** @class */ (function (_super) {
+    __extends(Square, _super);
+    function Square(color, sideLength) {
+        var _this = _super.call(this) || this;
+        _this.color = color;
+        _this.sideLength = sideLength;
+        _this.name = "square";
+        return _this;
     }
-    Object.defineProperty(Group.prototype, "area", {
-        get: function () {
-            return this._area;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Group.prototype, "status", {
-        get: function () {
-            return this._status;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Group.prototype, "students", {
-        get: function () {
-            return this._students;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Group.prototype, "directionName", {
-        get: function () {
-            return this._directionName;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Group.prototype, "levelName", {
-        get: function () {
-            return this._levelName;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Group.prototype.addStudent = function (addedStudent) {
-        this._students.push(addedStudent);
+    Square.prototype.calculateArea = function () {
+        return this.sideLength * 4;
     };
-    Group.prototype.removeStudent = function (removedStudent) {
-        this._students.filter(function (student) { return student != removedStudent; });
+    Square.prototype.print = function () {
+        console.log("a * 4");
     };
-    Group.prototype.setStatus = function (status) {
-        this._status = status;
-    };
-    Group.prototype.showPerformance = function () {
-        var sortedStudents = __spreadArray([], this._students, true).sort(function (a, b) { return b.getPerformanceRating() - a.getPerformanceRating(); });
-        console.log.apply(console, this._students);
-        console.log(sortedStudents);
-        return sortedStudents;
-    };
-    return Group;
-}());
-exports.Group = Group;
-var Student = /** @class */ (function () {
-    function Student(firstName, lastName, birthYear) {
-        this._grades = [];
-        this._visits = [];
-        this._firstName = firstName;
-        this._lastName = lastName;
-        this._birthYear = birthYear;
+    return Square;
+}(Figure));
+exports.Square = Square;
+var Triangle = /** @class */ (function (_super) {
+    __extends(Triangle, _super);
+    function Triangle(color, sideLength, height) {
+        var _this = _super.call(this) || this;
+        _this.color = color;
+        _this.sideLength = sideLength;
+        _this.height = height;
+        _this.name = "triangle";
+        return _this;
     }
-    Object.defineProperty(Student.prototype, "fullName", {
-        get: function () {
-            return "".concat(this._lastName, " ").concat(this._firstName);
-        },
-        set: function (value) {
-            var _a;
-            _a = value.split(" "), this._lastName = _a[0], this._firstName = _a[1];
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Student.prototype, "age", {
-        get: function () {
-            return new Date().getFullYear() - this._birthYear;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Student.prototype, "grade", {
-        set: function (grade) {
-            this._grades.push(grade);
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Student.prototype, "visit", {
-        set: function (visit) {
-            this._visits.push(visit);
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Student.prototype.getPerformanceRating = function () {
-        if (!this._grades.length)
-            return 0;
-        var averageGrade = this._grades.reduce(function (sum, grade) { return sum + grade.mark; }, 0) /
-            this._grades.length;
-        return averageGrade;
+    Triangle.prototype.calculateArea = function () {
+        return 0.5 * this.sideLength * this.height;
     };
-    return Student;
-}());
-exports.Student = Student;
+    return Triangle;
+}(Figure));
+exports.Triangle = Triangle;

@@ -6,11 +6,8 @@ abstract class Figure {
 }
 
 class Circle extends Figure {
-  constructor(
-    readonly name: string = "circle",
-    readonly color: string,
-    public radius: number
-  ) {
+  readonly name: string = "circle";
+  constructor(readonly color: string, public radius: number) {
     super();
   }
 
@@ -19,8 +16,8 @@ class Circle extends Figure {
   }
 }
 class Rectangle extends Figure {
+  readonly name: string = "rectangle";
   constructor(
-    readonly name: string = "rectangle",
     readonly color: string,
     public sideLength: number,
     public sideWidth: number
@@ -37,11 +34,8 @@ class Rectangle extends Figure {
   }
 }
 class Square extends Figure {
-  constructor(
-    readonly name: string = "square",
-    readonly color: string,
-    public sideLength: number
-  ) {
+  readonly name: string = "square";
+  constructor(readonly color: string, public sideLength: number) {
     super();
   }
 
@@ -54,8 +48,8 @@ class Square extends Figure {
   }
 }
 class Triangle extends Figure {
+  readonly name: string = "triangle";
   constructor(
-    readonly name: string = "triangle",
     readonly color: string,
     public sideLength: number,
     public height: number
@@ -67,3 +61,5 @@ class Triangle extends Figure {
     return 0.5 * this.sideLength * this.height;
   }
 }
+
+export { Circle, Rectangle, Square, Triangle };
