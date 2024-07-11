@@ -1,4 +1,5 @@
 abstract class Figure {
+  abstract readonly name: string;
   constructor(readonly color: string) {}
 
   public abstract calculateArea(): number;

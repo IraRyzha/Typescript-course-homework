@@ -4,7 +4,7 @@ var index_1 = require("./index");
 var CircleObject = new index_1.Circle("yellow", 5);
 var RectangleObject = new index_1.Rectangle("red", 4, 3);
 var SquareObject = new index_1.Square("green", 10);
-var TriangleObject = new index_1.Triangle("blue", 3, 5);
+var TriangleObject = new index_1.Triangle("blue", 3, 5, 4);
 console.log(CircleObject.calculateArea());
 console.log(" ");
 console.log(RectangleObject.calculateArea());
