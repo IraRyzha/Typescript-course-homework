@@ -1,28 +1,32 @@
 abstract class Figure {
-  public abstract readonly name: string;
-  public abstract readonly color: string;
+  constructor(readonly color: string) {}
 
   public abstract calculateArea(): number;
+}
+
+interface IPrintable {
+  print(): void;
 }
 
 class Circle extends Figure {
   readonly name: string = "circle";
   constructor(readonly color: string, public radius: number) {
-    super();
+    super(color);
   }
 
   calculateArea() {
     return Math.PI * Math.pow(this.radius, 2);
   }
 }
-class Rectangle extends Figure {
+
+class Rectangle extends Figure implements IPrintable {
   readonly name: string = "rectangle";
   constructor(
     readonly color: string,
     public sideLength: number,
     public sideWidth: number
   ) {
-    super();
+    super(color);
   }
 
   calculateArea() {
@@ -33,10 +37,11 @@ class Rectangle extends Figure {
     console.log("(a + b) * 2");
   }
 }
-class Square extends Figure {
+
+class Square extends Figure implements IPrintable {
   readonly name: string = "square";
   constructor(readonly color: string, public sideLength: number) {
-    super();
+    super(color);
   }
 
   calculateArea() {
@@ -47,6 +52,7 @@ class Square extends Figure {
     console.log("a * 4");
   }
 }
+
 class Triangle extends Figure {
   readonly name: string = "triangle";
   constructor(
@@ -54,7 +60,7 @@ class Triangle extends Figure {
     public sideLength: number,
     public height: number
   ) {
-    super();
+    super(color);
   }
 
   calculateArea() {
