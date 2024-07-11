@@ -30,7 +30,7 @@ class Rectangle extends Figure implements IPrintable {
   }
 
   calculateArea() {
-    return (this.sideLength + this.sideWidth) * 2;
+    return this.sideLength * this.sideWidth;
   }
 
   print() {
@@ -45,7 +45,7 @@ class Square extends Figure implements IPrintable {
   }
 
   calculateArea() {
-    return this.sideLength * 4;
+    return Math.pow(this.sideLength, 2);
   }
 
   print() {
@@ -57,14 +57,15 @@ class Triangle extends Figure {
   readonly name: string = "triangle";
   constructor(
     readonly color: string,
-    public sideLength: number,
-    public height: number
+    public sideLength1: number,
+    public sideLength2: number,
+    public sideLength3: number
   ) {
     super(color);
   }
 
   calculateArea() {
-    return 0.5 * this.sideLength * this.height;
+    return this.sideLength1 * this.sideLength2 * this.sideLength3;
   }
 }
 
