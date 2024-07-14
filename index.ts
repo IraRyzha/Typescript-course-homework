@@ -1,73 +1,108 @@
-abstract class Figure {
-  abstract readonly name: string;
-  constructor(readonly color: string) {}
-
-  public abstract calculateArea(): number;
+// Task 1
+interface RandomIndex {
+  [key: string]: string | number;
 }
 
-interface IPrintable {
-  print(): void;
+const user: RandomIndex = {
+  name: "Tom",
+  age: 11,
+};
+
+// Task 2
+interface FunctionIndex {
+  [key: string]: (...params: any[]) => any;
 }
 
-class Circle extends Figure {
-  readonly name: string = "circle";
-  constructor(readonly color: string, public radius: number) {
-    super(color);
-  }
+const example: FunctionIndex = {
+  sum: (a: number, b: number) => a + b,
+  say: (message: string) => console.log(message),
+};
 
-  calculateArea() {
-    return Math.PI * Math.pow(this.radius, 2);
-  }
+// Task 3
+interface ArrayIndex<T> {
+  [key: number]: T;
 }
 
-class Rectangle extends Figure implements IPrintable {
-  readonly name: string = "rectangle";
-  constructor(
-    readonly color: string,
-    public sideLength: number,
-    public sideWidth: number
-  ) {
-    super(color);
-  }
+const exampleArray1: ArrayIndex<number | string> = [3, 5, "Hello", 7, "hi", 1];
+const exampleArray2: ArrayIndex<boolean> = {
+  0: true,
+  1: false,
+  2: true,
+};
 
-  calculateArea() {
-    return this.sideLength * this.sideWidth;
-  }
-
-  print() {
-    console.log("(a + b) * 2");
-  }
+// Task 4
+interface Identifier {
+  name: string;
+  [key: string]: string | number;
 }
 
-class Square extends Figure implements IPrintable {
-  readonly name: string = "square";
-  constructor(readonly color: string, public sideLength: number) {
-    super(color);
-  }
+const myDog: Identifier = {
+  name: "Cabaka",
+  age: 3,
+};
 
-  calculateArea() {
-    return Math.pow(this.sideLength, 2);
-  }
-
-  print() {
-    console.log("a * 4");
-  }
+// Task 5
+interface IdentifierSuper {
+  [key: string]: string | number | boolean | (() => void);
 }
 
-class Triangle extends Figure {
-  readonly name: string = "triangle";
-  constructor(
-    readonly color: string,
-    public sideLength1: number,
-    public sideLength2: number,
-    public sideLength3: number
-  ) {
-    super(color);
-  }
-
-  calculateArea() {
-    return this.sideLength1 * this.sideLength2 * this.sideLength3;
-  }
+interface IdentifierSub extends IdentifierSuper {
+  id: number;
+  isOwner: boolean;
+  run(): () => void;
+  stop(): () => void;
 }
 
-export { Circle, Rectangle, Square, Triangle };
+// Task 6
+interface IIdentifier {
+  [key: string]: any;
+}
+
+const studend: IIdentifier = {
+  name: "randomName",
+  age: 25,
+  job: "dev",
+  marks: [5, 4, 1, 3, 7],
+  address: {
+    index: 1,
+    country: "uk",
+    city: "vin",
+  },
+};
+
+function isObject(value: any): boolean {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isNumber(value: any): boolean {
+  if (Array.isArray(value)) {
+    for (let el of value) {
+      if (typeof el !== "number") {
+        return false;
+      }
+    }
+    return true;
+  }
+  if (isObject(value)) {
+    for (let el in value) {
+      if (typeof value[el] !== "number") {
+        return false;
+      }
+    }
+    return true;
+  }
+  return typeof value === "number";
+}
+
+function checkFieldIsNumberType(object: IIdentifier) {
+  for (const key in object) {
+    if (key === "name" || key === "job" || key === "country") {
+      continue;
+    }
+    if (!isNumber(object[key])) {
+      return false;
+    }
+  }
+  return true;
+}
+// console.log(checkFieldIsNumberType(studend));

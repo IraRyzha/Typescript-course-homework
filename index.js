@@ -1,93 +1,66 @@
-"use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Triangle = exports.Square = exports.Rectangle = exports.Circle = void 0;
-var Figure = /** @class */ (function () {
-    function Figure(color) {
-        this.color = color;
+var user = {
+    name: "Tom",
+    age: 11,
+};
+var example = {
+    sum: function (a, b) { return a + b; },
+    say: function (message) { return console.log(message); },
+    queNumber: function (num) { return console.log(num); },
+};
+example.queNumber(true);
+var exampleArray1 = [3, 5, "Hello", 7, "hi", 1];
+var exampleArray2 = {
+    0: true,
+    1: false,
+    2: true,
+};
+var myDog = {
+    name: "Cabaka",
+    age: 3,
+};
+var studend = {
+    name: "randomName",
+    age: 25,
+    job: "dev",
+    marks: [5, 4, 1, 3, 7],
+    address: {
+        index: 1,
+        country: "uk",
+        city: "vin",
+    },
+};
+function isObject(value) {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+function isNumber(value) {
+    if (Array.isArray(value)) {
+        for (var _i = 0, value_1 = value; _i < value_1.length; _i++) {
+            var el = value_1[_i];
+            if (typeof el !== "number") {
+                return false;
+            }
+        }
+        return true;
     }
-    return Figure;
-}());
-var Circle = /** @class */ (function (_super) {
-    __extends(Circle, _super);
-    function Circle(color, radius) {
-        var _this = _super.call(this, color) || this;
-        _this.color = color;
-        _this.radius = radius;
-        _this.name = "circle";
-        return _this;
+    if (isObject(value)) {
+        for (var el in value) {
+            if (typeof value[el] !== "number") {
+                return false;
+            }
+        }
+        return true;
     }
-    Circle.prototype.calculateArea = function () {
-        return Math.PI * Math.pow(this.radius, 2);
-    };
-    return Circle;
-}(Figure));
-exports.Circle = Circle;
-var Rectangle = /** @class */ (function (_super) {
-    __extends(Rectangle, _super);
-    function Rectangle(color, sideLength, sideWidth) {
-        var _this = _super.call(this, color) || this;
-        _this.color = color;
-        _this.sideLength = sideLength;
-        _this.sideWidth = sideWidth;
-        _this.name = "rectangle";
-        return _this;
+    return typeof value === "number";
+}
+function checkFieldIsNumberType(object) {
+    for (var key in object) {
+        if (key === "name" || key === "job" || key === "country") {
+            continue;
+        }
+        if (!isNumber(object[key])) {
+            return false;
+        }
     }
-    Rectangle.prototype.calculateArea = function () {
-        return this.sideLength * this.sideWidth;
-    };
-    Rectangle.prototype.print = function () {
-        console.log("(a + b) * 2");
-    };
-    return Rectangle;
-}(Figure));
-exports.Rectangle = Rectangle;
-var Square = /** @class */ (function (_super) {
-    __extends(Square, _super);
-    function Square(color, sideLength) {
-        var _this = _super.call(this, color) || this;
-        _this.color = color;
-        _this.sideLength = sideLength;
-        _this.name = "square";
-        return _this;
-    }
-    Square.prototype.calculateArea = function () {
-        return Math.pow(this.sideLength, 2);
-    };
-    Square.prototype.print = function () {
-        console.log("a * 4");
-    };
-    return Square;
-}(Figure));
-exports.Square = Square;
-var Triangle = /** @class */ (function (_super) {
-    __extends(Triangle, _super);
-    function Triangle(color, sideLength1, sideLength2, sideLength3) {
-        var _this = _super.call(this, color) || this;
-        _this.color = color;
-        _this.sideLength1 = sideLength1;
-        _this.sideLength2 = sideLength2;
-        _this.sideLength3 = sideLength3;
-        _this.name = "triangle";
-        return _this;
-    }
-    Triangle.prototype.calculateArea = function () {
-        return this.sideLength1 * this.sideLength2 * this.sideLength3;
-    };
-    return Triangle;
-}(Figure));
-exports.Triangle = Triangle;
+    return true;
+}
+// console.log(checkFieldIsNumberType(studend));
