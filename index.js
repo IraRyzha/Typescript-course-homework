@@ -1,161 +1,68 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var Vehicle = /** @class */ (function () {
-    function Vehicle(brand) {
-        this.brand = brand;
+// Task 1
+function filterArray(array, condition) {
+    return array.filter(condition);
+}
+var numbers = [5, 1, 3, 8, 6, 0, 12, 15, 16, 22];
+var isParne = function (num) { return num % 2 === 0; };
+var filteredNumbers = filterArray(numbers, isParne);
+var Stack = /** @class */ (function () {
+    function Stack(items) {
+        if (items === void 0) { items = []; }
+        this.items = items;
     }
-    return Vehicle;
+    Stack.prototype.push = function (item) {
+        this.items.push(item);
+    };
+    Stack.prototype.pop = function () {
+        this.items.pop();
+    };
+    Stack.prototype.peek = function (id) {
+        return this.items.find(function (item) { return item.id === id; });
+    };
+    return Stack;
 }());
-var Car = /** @class */ (function (_super) {
-    __extends(Car, _super);
-    function Car(brand, seats) {
-        var _this = _super.call(this, brand) || this;
-        _this.seats = seats;
-        return _this;
+var Item = /** @class */ (function () {
+    function Item(id, name) {
+        this.id = id;
+        this.name = name;
     }
-    Car.prototype.getType = function () {
-        return "car";
-    };
-    Car.prototype.performAction = function () {
-        return "Car ".concat(this.brand, " with ").concat(this.seats, " seats is starting its engine.");
-    };
-    return Car;
-}(Vehicle));
-var Truck = /** @class */ (function (_super) {
-    __extends(Truck, _super);
-    function Truck(brand, capacity) {
-        var _this = _super.call(this, brand) || this;
-        _this.capacity = capacity;
-        return _this;
-    }
-    Truck.prototype.getType = function () {
-        return "truck";
-    };
-    Truck.prototype.getAction = function () {
-        return "Truck ".concat(this.brand, " with capacity ").concat(this.capacity, " kg is loading cargo.");
-    };
-    return Truck;
-}(Vehicle));
-var Motorcycle = /** @class */ (function (_super) {
-    __extends(Motorcycle, _super);
-    function Motorcycle(brand, hasSidecar) {
-        var _this = _super.call(this, brand) || this;
-        _this.hasSidecar = hasSidecar;
-        return _this;
-    }
-    Motorcycle.prototype.getType = function () {
-        return "motorcycle";
-    };
-    Motorcycle.prototype.action = function () {
-        var sidecarStatus = this.hasSidecar ? "with" : "without";
-        return "Motorcycle ".concat(this.brand, " ").concat(sidecarStatus, " sidecar is revving its engine.");
-    };
-    return Motorcycle;
-}(Vehicle));
-var VehicleValidator = /** @class */ (function () {
-    function VehicleValidator() {
-    }
-    VehicleValidator.isCar = function (vehicle) {
-        return vehicle instanceof Car;
-    };
-    VehicleValidator.isTruck = function (vehicle) {
-        return vehicle instanceof Truck;
-    };
-    VehicleValidator.isMotorcycle = function (vehicle) {
-        return vehicle instanceof Motorcycle;
-    };
-    return VehicleValidator;
+    return Item;
 }());
-var VehicleList = /** @class */ (function () {
-    function VehicleList() {
-        this.vehicles = [];
+var StackObject = new Stack();
+var item1 = new Item(5, "randomName1");
+var item2 = new Item(4, "randomName2");
+var item3 = new Item(2, "randomName3");
+var item4 = new Item(3, "randomName4");
+StackObject.push(item1);
+StackObject.push(item2);
+StackObject.push(item3);
+StackObject.push(item4);
+// console.log(StackObject.items);
+StackObject.pop();
+// console.log(StackObject.items);
+// console.log(StackObject.peek(5));
+// console.log(StackObject.peek(3));
+// Task 3
+var Dictionary = /** @class */ (function () {
+    function Dictionary() {
+        this.items = new Map();
     }
-    VehicleList.prototype.addVehicle = function (vehicle) {
-        var _a;
-        if (Array.isArray(vehicle)) {
-            (_a = this.vehicles).push.apply(_a, vehicle);
-        }
-        else {
-            this.vehicles.push(vehicle);
-        }
-        // this.saveToLocalStorage();
+    Dictionary.prototype.set = function (key, value) {
+        this.items.set(key, value);
     };
-    VehicleList.prototype.performVehicleActions = function (number) {
-        var selectedVehicle = this.vehicles[number];
-        if (VehicleValidator.isCar(selectedVehicle)) {
-            return selectedVehicle.performAction();
-        }
-        else if (VehicleValidator.isTruck(selectedVehicle)) {
-            return selectedVehicle.getAction();
-        }
-        else if (VehicleValidator.isMotorcycle(selectedVehicle)) {
-            return selectedVehicle.action();
-        }
-        else {
-            throw new Error("Unhandled vehicle type: ".concat(selectedVehicle));
-        }
+    Dictionary.prototype.get = function (key) {
+        return this.items.get(key);
     };
-    VehicleList.prototype.saveToLocalStorage = function () {
-        var vehiclesJSON = this.vehicles.map(function (vehicle) { return (__assign({ type: vehicle.getType() }, vehicle)); });
-        localStorage.setItem("vehicles", JSON.stringify(vehiclesJSON));
+    Dictionary.prototype.has = function (key) {
+        return this.items.has(key);
     };
-    VehicleList.prototype.loadFromLocalStorage = function () {
-        var vehiclesJSON = JSON.parse(localStorage.getItem("vehicles") || "[]");
-        console.log(vehiclesJSON);
-        this.vehicles = vehiclesJSON;
-    };
-    VehicleList.prototype.vehicleFromJSON = function () {
-        // ?
-    };
-    VehicleList.prototype.loadFromStorage = function () {
-        this.loadFromLocalStorage();
-        return this.vehicles;
-    };
-    return VehicleList;
+    return Dictionary;
 }());
-var VehicleListObject = new VehicleList();
-var myCar = new Car("ferrari", 2);
-var myTruck = new Truck("niko trans", 12);
-var myMotorcycle = new Motorcycle("fire", true);
-var vehicleObjects = [myCar, myTruck, myMotorcycle];
-VehicleListObject.addVehicle(vehicleObjects);
-console.log(VehicleListObject.performVehicleActions(0));
-console.log(VehicleListObject.performVehicleActions(1));
-console.log(VehicleListObject.performVehicleActions(2));
-// const carTag: HTMLElement | null = document.querySelector(".CarInfo");
-// const truckTag: HTMLElement | null = document.querySelector(".TruckInfo");
-// const motorcycleTag: HTMLElement | null =
-//   document.querySelector(".MotorcycleInfo");
-// if (carTag) {
-//   carTag.innerHTML = `<p>${VehicleListObject.performVehicleActions(0)}</p>`;
-// }
-// if (truckTag) {
-//   truckTag.textContent = VehicleListObject.performVehicleActions(1);
-// }
-// if (motorcycleTag) {
-//   motorcycleTag.textContent = VehicleListObject.performVehicleActions(2);
-// }
+var DictionaryObject = new Dictionary();
+DictionaryObject.set("key", 56);
+DictionaryObject.set(3, "value");
+console.log(DictionaryObject.get(3));
+console.log(DictionaryObject.get("key"));
+console.log(DictionaryObject.get("wrong key"));
+console.log(DictionaryObject.has("key"));
+console.log(DictionaryObject.has("wrong key"));
