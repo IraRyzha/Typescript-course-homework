@@ -1,8 +1,8 @@
 // Task 1
 
-// function filterArray<T>(array: any[], condition: any) {
-//   return array.filter()
-// }
+function filterArray<T>(array: T[], condition: (element: T) => boolean) {
+  return array.filter(condition);
+}
 
 // Task 2
 
@@ -24,19 +24,16 @@ class Stack<T extends { id: number }> {
 
 // Task 3
 
-interface IDictionary<V> {
-  [key: string]: V;
-}
+class Dictionary<K extends string | number | symbol, V> {
+  private items: Map<K, V> = new Map();
 
-class Dictionary<K extends string, V> {
-  private items: any = {};
-  set(key: K, value: V) {
-    this.items[key] = value;
+  set(key: K, value: V): void {
+    this.items.set(key, value);
   }
-  get(key: K): IDictionary<V> | undefined {
-    return this.items[key];
+  get(key: K): V | undefined {
+    return this.items.get(key);
   }
-  has(key: K) {
-    return this.items.hasOwnProperty(key) ? true : false;
+  has(key: K): boolean {
+    return this.items.has(key);
   }
 }
