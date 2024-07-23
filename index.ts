@@ -1,6 +1,6 @@
 // Task 1
 
-function filterArray<T>(array: T[], condition: (element: T) => boolean) {
+function filterArray<T>(array: T[], condition: (element: T) => boolean): T[] {
   return array.filter(condition);
 }
 
