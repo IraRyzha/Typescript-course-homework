@@ -33,9 +33,9 @@ const user1: DeepReadonly<IUser1> = {
 
 type DeepRequireReadonly<T> = {
   readonly [K in keyof T]-?: T[K] extends object
-    ? T[K] extends Function
-      ? T[K]
-      : DeepRequireReadonly<T[K]>
+    ? DeepRequireReadonly<T[K]>
+    : T[K] extends undefined
+    ? DeepRequireReadonly<T[K]>
     : T[K];
 };
 
@@ -61,7 +61,7 @@ const user2: DeepRequireReadonly<IUser2> = {
 };
 
 // user2.name = "otherName"; // Error
-//  Скажіть як правильно зробити тип DeepRequireReadonly щоб виникала помилка
+//  Скажіть як правильно зробити тип DeepRequireReadonly щоб тут виникала помилка коли grades то тоді працює коли grades? то ні
 user2.grades.Math = 9;
 
 // Task 3
