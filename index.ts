@@ -1,89 +1,194 @@
 // Task 1
 
-function filterArray<T>(array: T[], condition: (element: T) => boolean): T[] {
-  return array.filter(condition);
+type DeepReadonly<T> = {
+  readonly [K in keyof T]: T[K] extends object ? DeepReadonly<T[K]> : T[K];
+};
+
+interface IUser1 {
+  name: string;
+  age: number;
+  isAdmin: boolean;
+  grades: {
+    English: number;
+    Math: number;
+    Programming: number;
+  };
 }
 
-const numbers = [5, 1, 3, 8, 6, 0, 12, 15, 16, 22];
-const isParne = (num: number) => num % 2 === 0;
+const user1: DeepReadonly<IUser1> = {
+  name: "name1",
+  age: 12,
+  isAdmin: false,
+  grades: {
+    English: 11,
+    Math: 10,
+    Programming: 12,
+  },
+};
 
-const filteredNumbers = filterArray(numbers, isParne);
-// console.log(filteredNumbers);
+// user1.age = 8; // Error
+// user1.grades.Programming = 9 // Error
 
 // Task 2
 
-interface IId {
-  id: number;
+type DeepRequireReadonly<T> = {
+  readonly [K in keyof T]-?: T[K] extends object
+    ? T[K] extends Function
+      ? T[K]
+      : DeepRequireReadonly<T[K]>
+    : T[K];
+};
+
+interface IUser2 {
+  name?: string;
+  age?: number;
+  isAdmin?: boolean;
+  grades?: {
+    English?: number;
+    Math?: number;
+    Programming?: number;
+  };
 }
 
-class Stack<T extends IId> {
-  constructor(public items: T[] = []) {}
+const user2: DeepRequireReadonly<IUser2> = {
+  name: "name1",
+  age: 12,
+  isAdmin: false,
+  grades: {
+    English: 25,
+    Math: 23,
+  },
+};
 
-  push(item: T): void {
-    this.items.push(item);
-  }
-
-  pop(): void {
-    this.items.pop();
-  }
-
-  peek(id: number): T | undefined {
-    return this.items.find((item) => item.id === id);
-  }
-}
-
-interface IItem extends IId {
-  name: string;
-}
-
-class Item implements IItem {
-  constructor(public id: number, public name: string) {}
-}
-
-const StackObject = new Stack<IItem>();
-
-const item1 = new Item(5, "randomName1");
-const item2 = new Item(4, "randomName2");
-const item3 = new Item(2, "randomName3");
-const item4 = new Item(3, "randomName4");
-
-StackObject.push(item1);
-StackObject.push(item2);
-StackObject.push(item3);
-StackObject.push(item4);
-
-// console.log(StackObject.items);
-
-StackObject.pop();
-
-// console.log(StackObject.items);
-
-// console.log(StackObject.peek(5));
-// console.log(StackObject.peek(3));
+// user2.name = "otherName"; // Error
+//  Скажіть як правильно зробити тип DeepRequireReadonly щоб виникала помилка
+user2.grades.Math = 9;
 
 // Task 3
 
-class Dictionary<K extends string | number | symbol, V> {
-  private items: Map<K, V> = new Map();
+type ToUpperCase<K extends string> = Uppercase<K>;
 
-  set(key: K, value: V): void {
-    this.items.set(key, value);
-  }
-  get(key: K): V | undefined {
-    return this.items.get(key);
-  }
-  has(key: K): boolean {
-    return this.items.has(key);
-  }
+type UpperCaseKeys<T> = {
+  readonly [K in keyof T & string as ToUpperCase<K>]: T[K];
+};
+
+interface IUser3 {
+  name: string;
+  age: number;
+  isAdmin: boolean;
 }
 
-const DictionaryObject = new Dictionary<string | number, number | string>();
+const user3: UpperCaseKeys<IUser3> = {
+  NAME: "name",
+  AGE: 67,
+  ISADMIN: true,
+};
 
-DictionaryObject.set("key", 56);
-DictionaryObject.set(3, "value");
+// Task 4
 
-console.log(DictionaryObject.get(3));
-console.log(DictionaryObject.get("key"));
-console.log(DictionaryObject.get("wrong key"));
-console.log(DictionaryObject.has("key"));
-console.log(DictionaryObject.has("wrong key"));
+type ObjectToPropertyDescriptor<T> = {
+  [K in keyof T]: {
+    value?: T[K];
+    get?(): T[K];
+    set?(value: T[K]): void;
+  };
+};
+
+interface IUser4 {
+  name: string;
+  age: number;
+  isAdmin: boolean;
+}
+
+const userWithValues: ObjectToPropertyDescriptor<IUser4> = {
+  name: {
+    value: "username",
+  },
+  age: {
+    value: 34,
+  },
+  isAdmin: {
+    value: true,
+  },
+};
+
+const userObject = Object.create({}, userWithValues);
+
+console.log(userObject.name);
+
+//
+console.log(" ");
+//
+
+const personWithAccessors = {
+  name: "initial name",
+  age: 0,
+  isAdmin: false,
+};
+
+const userWithAccessors: ObjectToPropertyDescriptor<IUser4> = {
+  name: {
+    get() {
+      return personWithAccessors.name;
+    },
+    set(value: string) {
+      personWithAccessors.name = value;
+    },
+  },
+  age: {
+    get() {
+      return personWithAccessors.age;
+    },
+    set(value: number) {
+      personWithAccessors.age = value;
+    },
+  },
+  isAdmin: {
+    get() {
+      return personWithAccessors.isAdmin;
+    },
+    set(value: boolean) {
+      personWithAccessors.isAdmin = value;
+    },
+  },
+};
+
+const userObject2 = Object.create({}, userWithAccessors);
+
+console.log(userObject2.age);
+userObject2.age = 55;
+console.log(userObject2.age);
+
+//
+//
+//
+
+// const user4: ObjectToPropertyDescriptor<IUser4> = {
+//   name: {
+//     value: "name",
+//     get(): string {
+//       return this.value;
+//     },
+//     set(value: string) {
+//       this.value = value;
+//     },
+//   },
+//   age: {
+//     value: 34,
+//     get() {
+//       return this.value;
+//     },
+//     set(value: number) {
+//       this.value = value;
+//     },
+//   },
+//   isAdmin: {
+//     value: true,
+//     get() {
+//       return this.value;
+//     },
+//     set(value: boolean) {
+//       this.value = value;
+//     },
+//   },
+// };
