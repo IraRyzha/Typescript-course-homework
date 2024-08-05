@@ -1,194 +1,142 @@
-// Task 1
-
-type DeepReadonly<T> = {
-  readonly [K in keyof T]: T[K] extends object ? DeepReadonly<T[K]> : T[K];
-};
-
-interface IUser1 {
+interface IFilm {
   name: string;
-  age: number;
-  isAdmin: boolean;
-  grades: {
-    English: number;
-    Math: number;
-    Programming: number;
-  };
+  year: number;
+  rate: number;
+  awards: string[];
 }
 
-const user1: DeepReadonly<IUser1> = {
-  name: "name1",
-  age: 12,
-  isAdmin: false,
-  grades: {
-    English: 11,
-    Math: 10,
-    Programming: 12,
-  },
-};
-
-// user1.age = 8; // Error
-// user1.grades.Programming = 9 // Error
-
-// Task 2
-
-type DeepRequireReadonly<T> = {
-  readonly [K in keyof T]-?: T[K] extends object
-    ? DeepRequireReadonly<T[K]>
-    : T[K] extends undefined
-    ? DeepRequireReadonly<T[K]>
-    : T[K];
-};
-
-interface IUser2 {
-  name?: string;
-  age?: number;
-  isAdmin?: boolean;
-  grades?: {
-    English?: number;
-    Math?: number;
-    Programming?: number;
-  };
-}
-
-const user2: DeepRequireReadonly<IUser2> = {
-  name: "name1",
-  age: 12,
-  isAdmin: false,
-  grades: {
-    English: 25,
-    Math: 23,
-  },
-};
-
-// user2.name = "otherName"; // Error
-//  Скажіть як правильно зробити тип DeepRequireReadonly щоб тут виникала помилка коли grades то тоді працює коли grades? то ні
-user2.grades.Math = 9;
-
-// Task 3
-
-type ToUpperCase<K extends string> = Uppercase<K>;
-
-type UpperCaseKeys<T> = {
-  readonly [K in keyof T & string as ToUpperCase<K>]: T[K];
-};
-
-interface IUser3 {
+interface IFilmCategory {
   name: string;
-  age: number;
-  isAdmin: boolean;
+  films: IFilm[];
 }
 
-const user3: UpperCaseKeys<IUser3> = {
-  NAME: "name",
-  AGE: 67,
-  ISADMIN: true,
-};
-
-// Task 4
-
-type ObjectToPropertyDescriptor<T> = {
-  [K in keyof T]: {
-    value?: T[K];
-    get?(): T[K];
-    set?(value: T[K]): void;
-  };
-};
-
-interface IUser4 {
-  name: string;
-  age: number;
-  isAdmin: boolean;
+interface Filter {
+  filter: string;
 }
 
-const userWithValues: ObjectToPropertyDescriptor<IUser4> = {
-  name: {
-    value: "username",
-  },
-  age: {
-    value: 34,
-  },
-  isAdmin: {
-    value: true,
-  },
+interface RangeFilter extends Filter {
+  filterTo: string;
+}
+
+interface ValueFilter {
+  values: string[];
+}
+
+enum GridFilterTypeEnum {
+  MATCH = "MATCH",
+  RANGE = "RANGE",
+  VALUES = "VALUES",
+}
+
+type GridFilterValue<T> = {
+  type: GridFilterTypeEnum;
+  filter: Extract<T, string | number>;
+  filterTo?: Extract<T, string | number>;
 };
 
-const userObject = Object.create({}, userWithValues);
-
-console.log(userObject.name);
-
-//
-console.log(" ");
-//
-
-const personWithAccessors = {
-  name: "initial name",
-  age: 0,
-  isAdmin: false,
+type GridFilterSetValues<T> = {
+  values: T[];
 };
 
-const userWithAccessors: ObjectToPropertyDescriptor<IUser4> = {
-  name: {
-    get() {
-      return personWithAccessors.name;
-    },
-    set(value: string) {
-      personWithAccessors.name = value;
-    },
-  },
-  age: {
-    get() {
-      return personWithAccessors.age;
-    },
-    set(value: number) {
-      personWithAccessors.age = value;
-    },
-  },
-  isAdmin: {
-    get() {
-      return personWithAccessors.isAdmin;
-    },
-    set(value: boolean) {
-      personWithAccessors.isAdmin = value;
-    },
-  },
+type FilmFilters = {
+  nameFilter?: GridFilterValue<string>;
+  yearFilter?: GridFilterValue<number>;
+  rateFilter?: GridFilterValue<number>;
+  awardsFilter?: GridFilterSetValues<string>;
 };
 
-const userObject2 = Object.create({}, userWithAccessors);
+class FilmList {
+  private films: IFilm[];
+  private filters: FilmFilters;
 
-console.log(userObject2.age);
-userObject2.age = 55;
-console.log(userObject2.age);
+  constructor(films: IFilm[]) {
+    this.films = films;
+    this.filters = {};
+  }
 
-//
-//
-//
+  addFilm(film: IFilm) {
+    this.films.push(film);
+  }
 
-// const user4: ObjectToPropertyDescriptor<IUser4> = {
-//   name: {
-//     value: "name",
-//     get(): string {
-//       return this.value;
-//     },
-//     set(value: string) {
-//       this.value = value;
-//     },
-//   },
-//   age: {
-//     value: 34,
-//     get() {
-//       return this.value;
-//     },
-//     set(value: number) {
-//       this.value = value;
-//     },
-//   },
-//   isAdmin: {
-//     value: true,
-//     get() {
-//       return this.value;
-//     },
-//     set(value: boolean) {
-//       this.value = value;
-//     },
-//   },
-// };
+  removeFilm(name: string) {
+    this.films = this.films.filter((film) => film.name !== name);
+  }
+
+  applySearchValue(
+    filterName: keyof FilmFilters,
+    filterValue: GridFilterValue<string | number> | GridFilterSetValues<string>
+  ) {
+    this.filters[filterName] = filterValue;
+  }
+
+  applyFiltersValue(filters: FilmFilters) {
+    this.filters = filters;
+  }
+
+  search(): IFilm[] {
+    return this.films.filter((film) => {
+      return Object.keys(this.filters).every((filterName) => {
+        const filter = this.filters[filterName as keyof FilmFilters];
+        if (!filter) return true;
+
+        switch (filterName) {
+          case "nameFilter":
+            return (
+              (filter as GridFilterValue<string>).type ===
+                GridFilterTypeEnum.MATCH &&
+              film.name.includes(
+                (filter as GridFilterValue<string>).filter as string
+              )
+            );
+          case "yearFilter":
+            const yearFilter = filter as GridFilterValue<number>;
+            return (
+              yearFilter.type === GridFilterTypeEnum.RANGE &&
+              film.year >= (yearFilter.filter as number) &&
+              film.year <= (yearFilter.filterTo as number)
+            );
+          case "rateFilter":
+            const rateFilter = filter as GridFilterValue<number>;
+            return (
+              rateFilter.type === GridFilterTypeEnum.RANGE &&
+              film.rate >= (rateFilter.filter as number) &&
+              film.rate <= (rateFilter.filterTo as number)
+            );
+          case "awardsFilter":
+            const awardsFilter = filter as GridFilterSetValues<string>;
+            return awardsFilter.values.every((award) =>
+              film.awards.includes(award)
+            );
+          default:
+            return true;
+        }
+      });
+    });
+  }
+}
+
+// Example Usage
+
+const films: IFilm[] = [
+  { name: "Inception", year: 2010, rate: 8.8, awards: ["Oscar", "BAFTA"] },
+  { name: "The Dark Knight", year: 2008, rate: 9.0, awards: ["Oscar"] },
+  {
+    name: "Interstellar",
+    year: 2014,
+    rate: 8.6,
+    awards: ["Oscar", "Golden Globe"],
+  },
+];
+
+const filmList = new FilmList(films);
+filmList.applySearchValue("nameFilter", {
+  type: GridFilterTypeEnum.MATCH,
+  filter: "Inception",
+});
+console.log(filmList.search());
+
+filmList.applyFiltersValue({
+  yearFilter: { type: GridFilterTypeEnum.RANGE, filter: 2000, filterTo: 2015 },
+  rateFilter: { type: GridFilterTypeEnum.RANGE, filter: 8.0, filterTo: 9.0 },
+});
+console.log(filmList.search());
