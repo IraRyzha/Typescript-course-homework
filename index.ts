@@ -10,23 +10,29 @@ interface IFilmCategory {
   films: IFilm[];
 }
 
-interface Filter {
-  filter: string;
-}
-
-interface RangeFilter extends Filter {
-  filterTo: string;
-}
-
-interface ValueFilter {
-  values: string[];
-}
-
 enum GridFilterTypeEnum {
   MATCH = "MATCH",
   RANGE = "RANGE",
   VALUES = "VALUES",
 }
+
+interface Filter {
+  type: GridFilterTypeEnum.MATCH;
+  filter: string;
+}
+
+interface RangeFilter {
+  type: GridFilterTypeEnum.RANGE;
+  filter: number;
+  filterTo: number;
+}
+
+interface ValueFilter {
+  type: GridFilterTypeEnum.VALUES;
+  values: string[];
+}
+
+type GridFilter = Filter | RangeFilter | ValueFilter;
 
 type GridFilterValue<T> = {
   type: GridFilterTypeEnum;
@@ -62,11 +68,8 @@ class FilmList {
     this.films = this.films.filter((film) => film.name !== name);
   }
 
-  applySearchValue(
-    filterName: keyof FilmFilters,
-    filterValue: GridFilterValue<string | number> | GridFilterSetValues<string>
-  ) {
-    this.filters[filterName] = filterValue;
+  applySearchValue(filterName: keyof FilmFilters, filterValue: GridFilter) {
+    this.filters[filterName] = filterValue as any;
   }
 
   applyFiltersValue(filters: FilmFilters) {
@@ -115,7 +118,7 @@ class FilmList {
   }
 }
 
-// Example Usage
+//
 
 const films: IFilm[] = [
   { name: "Inception", year: 2010, rate: 8.8, awards: ["Oscar", "BAFTA"] },
@@ -136,7 +139,7 @@ filmList.applySearchValue("nameFilter", {
 console.log(filmList.search());
 
 filmList.applyFiltersValue({
-  yearFilter: { type: GridFilterTypeEnum.RANGE, filter: 2000, filterTo: 2015 },
+  yearFilter: { type: GridFilterTypeEnum.RANGE, filter: 2011, filterTo: 2015 },
   rateFilter: { type: GridFilterTypeEnum.RANGE, filter: 8.0, filterTo: 9.0 },
 });
 console.log(filmList.search());
