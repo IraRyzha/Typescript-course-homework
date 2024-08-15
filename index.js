@@ -1,80 +1,170 @@
-var GridFilterTypeEnum;
-(function (GridFilterTypeEnum) {
-    GridFilterTypeEnum["MATCH"] = "MATCH";
-    GridFilterTypeEnum["RANGE"] = "RANGE";
-    GridFilterTypeEnum["VALUES"] = "VALUES";
-})(GridFilterTypeEnum || (GridFilterTypeEnum = {}));
-var FilmList = /** @class */ (function () {
-    function FilmList(films) {
-        this.films = films;
-        this.filters = {};
+var formatDate = function (date) {
+    var day = String(date.getDate()).padStart(2, "0");
+    var month = String(date.getMonth() + 1).padStart(2, "0");
+    var year = date.getFullYear();
+    var hours = String(date.getHours()).padStart(2, "0");
+    var minutes = String(date.getMinutes()).padStart(2, "0");
+    return "".concat(day, ".").concat(month, ".").concat(year, " ").concat(hours, ":").concat(minutes);
+};
+var TodoList = /** @class */ (function () {
+    function TodoList(_notes) {
+        if (_notes === void 0) { _notes = []; }
+        this._notes = _notes;
     }
-    FilmList.prototype.addFilm = function (film) {
-        this.films.push(film);
+    Object.defineProperty(TodoList.prototype, "notes", {
+        get: function () {
+            return this._notes;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    TodoList.prototype.getNumberOfNotes = function () {
+        return this._notes.length;
     };
-    FilmList.prototype.removeFilm = function (name) {
-        this.films = this.films.filter(function (film) { return film.name !== name; });
+    TodoList.prototype.getNumberOfUncompletedNotes = function () {
+        var numberOfUncompletedNotes = 0;
+        this._notes.forEach(function (note) {
+            if (!note.completedStatus) {
+                numberOfUncompletedNotes++;
+            }
+        });
+        return numberOfUncompletedNotes;
     };
-    FilmList.prototype.applySearchValue = function (filterName, filterValue) {
-        this.filters[filterName] = filterValue;
+    TodoList.prototype.addNote = function (note) {
+        var _a;
+        if (Array.isArray(note)) {
+            (_a = this._notes).push.apply(_a, note);
+        }
+        else {
+            this._notes.push(note);
+        }
     };
-    FilmList.prototype.applyFiltersValue = function (filters) {
-        this.filters = filters;
+    TodoList.prototype.removeNote = function (title) {
+        this._notes = this._notes.filter(function (note) { return note.title !== title; });
     };
-    FilmList.prototype.search = function () {
-        var _this = this;
-        return this.films.filter(function (film) {
-            return Object.keys(_this.filters).every(function (filterName) {
-                var filter = _this.filters[filterName];
-                if (!filter)
-                    return true;
-                switch (filterName) {
-                    case "nameFilter":
-                        return (filter.type ===
-                            GridFilterTypeEnum.MATCH &&
-                            film.name.includes(filter.filter));
-                    case "yearFilter":
-                        var yearFilter = filter;
-                        return (yearFilter.type === GridFilterTypeEnum.RANGE &&
-                            film.year >= yearFilter.filter &&
-                            film.year <= yearFilter.filterTo);
-                    case "rateFilter":
-                        var rateFilter = filter;
-                        return (rateFilter.type === GridFilterTypeEnum.RANGE &&
-                            film.rate >= rateFilter.filter &&
-                            film.rate <= rateFilter.filterTo);
-                    case "awardsFilter":
-                        var awardsFilter = filter;
-                        return awardsFilter.values.every(function (award) {
-                            return film.awards.includes(award);
-                        });
-                    default:
-                        return true;
+    TodoList.prototype.editNote = function (title, updatedContent) {
+        this._notes.forEach(function (note) {
+            if (note.title === title) {
+                if (note.requiresConfirmation) {
+                    var confirmed = confirm("This note requires confirmation. Do you want to edit?");
+                    if (!confirmed)
+                        return;
                 }
-            });
+                note.content = updatedContent;
+                note.dateOfEditing = formatDate(new Date());
+            }
         });
     };
-    return FilmList;
+    TodoList.prototype.getNoteFullInfo = function (title) {
+        var selectedNote = this._notes.find(function (note) { return note.title === title; });
+        return "\n      Title: ".concat(selectedNote === null || selectedNote === void 0 ? void 0 : selectedNote.title, ",\n      Content: ").concat(selectedNote === null || selectedNote === void 0 ? void 0 : selectedNote.content, ", \n      Date of creation: ").concat(selectedNote === null || selectedNote === void 0 ? void 0 : selectedNote.dateOfCreation, ",\n      Date of editing: ").concat(selectedNote === null || selectedNote === void 0 ? void 0 : selectedNote.dateOfEditing, ",\n      Is completed: ").concat(selectedNote === null || selectedNote === void 0 ? void 0 : selectedNote.completedStatus, " \n    ");
+    };
+    TodoList.prototype.markNoteAsCompleted = function (title) {
+        this._notes.forEach(function (note) {
+            if (note.title === title) {
+                note.completedStatus = true;
+            }
+        });
+    };
+    TodoList.prototype.searchNotes = function (query) {
+        return this._notes.filter(function (note) { return note.title.includes(query) || note.content.includes(query); });
+    };
+    TodoList.prototype.sortNotes = function (by) {
+        if (by === "status") {
+            return this._notes.sort(function (a, b) { return Number(b.completedStatus) - Number(a.completedStatus); });
+        }
+        else if (by === "date") {
+            return this._notes.sort(function (a, b) {
+                return new Date(b.dateOfCreation).getTime() -
+                    new Date(a.dateOfCreation).getTime();
+            });
+        }
+        else {
+            return this._notes;
+        }
+    };
+    return TodoList;
 }());
-//
-var films = [
-    { name: "Inception", year: 2010, rate: 8.8, awards: ["Oscar", "BAFTA"] },
-    { name: "The Dark Knight", year: 2008, rate: 9.0, awards: ["Oscar"] },
+// Using App
+var TodoListApp = new TodoList();
+var getRandomDate = function () {
+    var start = new Date(2000, 0, 1);
+    var end = new Date();
+    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+};
+var myNotes = [
     {
-        name: "Interstellar",
-        year: 2014,
-        rate: 8.6,
-        awards: ["Oscar", "Golden Globe"],
+        title: "Note 1",
+        content: "Content of note 1",
+        dateOfCreation: formatDate(getRandomDate()),
+        dateOfEditing: formatDate(getRandomDate()),
+        completedStatus: false,
+    },
+    {
+        title: "Note 2",
+        content: "Content of note 2",
+        dateOfCreation: formatDate(getRandomDate()),
+        dateOfEditing: formatDate(getRandomDate()),
+        completedStatus: true,
+    },
+    {
+        title: "Note 3",
+        content: "Content of note 3",
+        dateOfCreation: formatDate(getRandomDate()),
+        dateOfEditing: formatDate(getRandomDate()),
+        completedStatus: false,
+    },
+    {
+        title: "Note 4",
+        content: "Content of note 4",
+        dateOfCreation: formatDate(getRandomDate()),
+        dateOfEditing: formatDate(getRandomDate()),
+        completedStatus: true,
+    },
+    {
+        title: "Note 5",
+        content: "Content of note 5",
+        dateOfCreation: formatDate(getRandomDate()),
+        dateOfEditing: formatDate(getRandomDate()),
+        completedStatus: false,
+    },
+    {
+        title: "Note 6",
+        content: "Content of note 6",
+        dateOfCreation: formatDate(getRandomDate()),
+        dateOfEditing: formatDate(getRandomDate()),
+        completedStatus: true,
+    },
+    {
+        title: "Note 7",
+        content: "Content of note 7",
+        dateOfCreation: formatDate(getRandomDate()),
+        dateOfEditing: formatDate(getRandomDate()),
+        completedStatus: false,
     },
 ];
-var filmList = new FilmList(films);
-filmList.applySearchValue("nameFilter", {
-    type: GridFilterTypeEnum.MATCH,
-    filter: "Inception",
-});
-console.log(filmList.search());
-filmList.applyFiltersValue({
-    yearFilter: { type: GridFilterTypeEnum.RANGE, filter: 2011, filterTo: 2015 },
-    rateFilter: { type: GridFilterTypeEnum.RANGE, filter: 8.0, filterTo: 9.0 },
-});
-console.log(filmList.search());
+TodoListApp.addNote(myNotes);
+console.log(TodoListApp.notes);
+console.log(TodoListApp.searchNotes("Content of note 1"));
+console.log(" ");
+console.log(TodoListApp.notes);
+console.log(TodoListApp.sortNotes("status"));
+console.log(" ");
+console.log(TodoListApp.notes);
+console.log(TodoListApp.sortNotes("date"));
+console.log(" ");
+console.log(TodoListApp.notes);
+console.log(TodoListApp.getNumberOfUncompletedNotes());
+console.log(" ");
+console.log(TodoListApp.getNumberOfNotes());
+TodoListApp.removeNote("Note 4");
+console.log(TodoListApp.getNumberOfNotes());
+console.log(" ");
+console.log(TodoListApp.getNoteFullInfo("Note 3"));
+TodoListApp.editNote("Note 3", "NEW!!! Content of note 3");
+console.log(TodoListApp.getNoteFullInfo("Note 3"));
+TodoListApp.markNoteAsCompleted("Note 3");
+console.log(TodoListApp.getNoteFullInfo("Note 3"));
+console.log(" ");
+console.log(TodoListApp.notes);
+console.log(" ");

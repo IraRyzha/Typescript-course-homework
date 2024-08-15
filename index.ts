@@ -1,145 +1,212 @@
-interface IFilm {
-  name: string;
-  year: number;
-  rate: number;
-  awards: string[];
+interface INote {
+  title: string;
+  content: string;
+  dateOfCreation: string;
+  dateOfEditing: string;
+  completedStatus: boolean;
+  requiresConfirmation?: boolean;
 }
 
-interface IFilmCategory {
-  name: string;
-  films: IFilm[];
-}
+const formatDate = (date: Date): string => {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
 
-enum GridFilterTypeEnum {
-  MATCH = "MATCH",
-  RANGE = "RANGE",
-  VALUES = "VALUES",
-}
-
-interface Filter {
-  type: GridFilterTypeEnum.MATCH;
-  filter: string;
-}
-
-interface RangeFilter {
-  type: GridFilterTypeEnum.RANGE;
-  filter: number;
-  filterTo: number;
-}
-
-interface ValueFilter {
-  type: GridFilterTypeEnum.VALUES;
-  values: string[];
-}
-
-type GridFilter = Filter | RangeFilter | ValueFilter;
-
-type GridFilterValue<T> = {
-  type: GridFilterTypeEnum;
-  filter: Extract<T, string | number>;
-  filterTo?: Extract<T, string | number>;
+  return `${day}.${month}.${year} ${hours}:${minutes}`;
 };
 
-type GridFilterSetValues<T> = {
-  values: T[];
-};
+class TodoList {
+  constructor(private _notes: INote[] = []) {}
 
-type FilmFilters = {
-  nameFilter?: GridFilterValue<string>;
-  yearFilter?: GridFilterValue<number>;
-  rateFilter?: GridFilterValue<number>;
-  awardsFilter?: GridFilterSetValues<string>;
-};
-
-class FilmList {
-  private films: IFilm[];
-  private filters: FilmFilters;
-
-  constructor(films: IFilm[]) {
-    this.films = films;
-    this.filters = {};
+  public get notes(): INote[] {
+    return this._notes;
   }
 
-  addFilm(film: IFilm) {
-    this.films.push(film);
+  getNumberOfNotes(): number {
+    return this._notes.length;
   }
 
-  removeFilm(name: string) {
-    this.films = this.films.filter((film) => film.name !== name);
+  getNumberOfUncompletedNotes(): number {
+    let numberOfUncompletedNotes: number = 0;
+    this._notes.forEach((note) => {
+      if (!note.completedStatus) {
+        numberOfUncompletedNotes++;
+      }
+    });
+    return numberOfUncompletedNotes;
   }
 
-  applySearchValue(filterName: keyof FilmFilters, filterValue: GridFilter) {
-    this.filters[filterName] = filterValue as any;
+  addNote(note: INote | INote[]): void {
+    if (Array.isArray(note)) {
+      this._notes.push(...note);
+    } else {
+      this._notes.push(note);
+    }
   }
 
-  applyFiltersValue(filters: FilmFilters) {
-    this.filters = filters;
+  removeNote(title: string): void {
+    this._notes = this._notes.filter((note) => note.title !== title);
   }
 
-  search(): IFilm[] {
-    return this.films.filter((film) => {
-      return Object.keys(this.filters).every((filterName) => {
-        const filter = this.filters[filterName as keyof FilmFilters];
-        if (!filter) return true;
-
-        switch (filterName) {
-          case "nameFilter":
-            return (
-              (filter as GridFilterValue<string>).type ===
-                GridFilterTypeEnum.MATCH &&
-              film.name.includes(
-                (filter as GridFilterValue<string>).filter as string
-              )
-            );
-          case "yearFilter":
-            const yearFilter = filter as GridFilterValue<number>;
-            return (
-              yearFilter.type === GridFilterTypeEnum.RANGE &&
-              film.year >= (yearFilter.filter as number) &&
-              film.year <= (yearFilter.filterTo as number)
-            );
-          case "rateFilter":
-            const rateFilter = filter as GridFilterValue<number>;
-            return (
-              rateFilter.type === GridFilterTypeEnum.RANGE &&
-              film.rate >= (rateFilter.filter as number) &&
-              film.rate <= (rateFilter.filterTo as number)
-            );
-          case "awardsFilter":
-            const awardsFilter = filter as GridFilterSetValues<string>;
-            return awardsFilter.values.every((award) =>
-              film.awards.includes(award)
-            );
-          default:
-            return true;
+  editNote(title: string, updatedContent: string): void {
+    this._notes.forEach((note) => {
+      if (note.title === title) {
+        if (note.requiresConfirmation) {
+          const confirmed = confirm(
+            "This note requires confirmation. Do you want to edit?"
+          );
+          if (!confirmed) return;
         }
-      });
+        note.content = updatedContent;
+        note.dateOfEditing = formatDate(new Date());
+      }
     });
   }
+
+  getNoteFullInfo(title: string): string {
+    const selectedNote = this._notes.find((note) => note.title === title);
+    return `
+      Title: ${selectedNote?.title},
+      Content: ${selectedNote?.content}, 
+      Date of creation: ${selectedNote?.dateOfCreation},
+      Date of editing: ${selectedNote?.dateOfEditing},
+      Is completed: ${selectedNote?.completedStatus} 
+    `;
+  }
+
+  markNoteAsCompleted(title: string): void {
+    this._notes.forEach((note) => {
+      if (note.title === title) {
+        note.completedStatus = true;
+      }
+    });
+  }
+
+  searchNotes(query: string): INote[] {
+    return this._notes.filter(
+      (note) => note.title.includes(query) || note.content.includes(query)
+    );
+  }
+
+  sortNotes(by: "status" | "date"): INote[] {
+    if (by === "status") {
+      return this._notes.sort(
+        (a, b) => Number(b.completedStatus) - Number(a.completedStatus)
+      );
+    } else if (by === "date") {
+      return this._notes.sort(
+        (a, b) =>
+          new Date(b.dateOfCreation).getTime() -
+          new Date(a.dateOfCreation).getTime()
+      );
+    } else {
+      return this._notes;
+    }
+  }
 }
 
-//
+// Using App
 
-const films: IFilm[] = [
-  { name: "Inception", year: 2010, rate: 8.8, awards: ["Oscar", "BAFTA"] },
-  { name: "The Dark Knight", year: 2008, rate: 9.0, awards: ["Oscar"] },
+const TodoListApp = new TodoList();
+
+const getRandomDate = (): Date => {
+  const start = new Date(2000, 0, 1);
+  const end = new Date();
+  return new Date(
+    start.getTime() + Math.random() * (end.getTime() - start.getTime())
+  );
+};
+
+const myNotes = [
   {
-    name: "Interstellar",
-    year: 2014,
-    rate: 8.6,
-    awards: ["Oscar", "Golden Globe"],
+    title: "Note 1",
+    content: "Content of note 1",
+    dateOfCreation: formatDate(getRandomDate()),
+    dateOfEditing: formatDate(getRandomDate()),
+    completedStatus: false,
+  },
+  {
+    title: "Note 2",
+    content: "Content of note 2",
+    dateOfCreation: formatDate(getRandomDate()),
+    dateOfEditing: formatDate(getRandomDate()),
+    completedStatus: true,
+  },
+  {
+    title: "Note 3",
+    content: "Content of note 3",
+    dateOfCreation: formatDate(getRandomDate()),
+    dateOfEditing: formatDate(getRandomDate()),
+    completedStatus: false,
+  },
+  {
+    title: "Note 4",
+    content: "Content of note 4",
+    dateOfCreation: formatDate(getRandomDate()),
+    dateOfEditing: formatDate(getRandomDate()),
+    completedStatus: true,
+  },
+  {
+    title: "Note 5",
+    content: "Content of note 5",
+    dateOfCreation: formatDate(getRandomDate()),
+    dateOfEditing: formatDate(getRandomDate()),
+    completedStatus: false,
+  },
+  {
+    title: "Note 6",
+    content: "Content of note 6",
+    dateOfCreation: formatDate(getRandomDate()),
+    dateOfEditing: formatDate(getRandomDate()),
+    completedStatus: true,
+  },
+  {
+    title: "Note 7",
+    content: "Content of note 7",
+    dateOfCreation: formatDate(getRandomDate()),
+    dateOfEditing: formatDate(getRandomDate()),
+    completedStatus: false,
   },
 ];
 
-const filmList = new FilmList(films);
-filmList.applySearchValue("nameFilter", {
-  type: GridFilterTypeEnum.MATCH,
-  filter: "Inception",
-});
-console.log(filmList.search());
+TodoListApp.addNote(myNotes);
 
-filmList.applyFiltersValue({
-  yearFilter: { type: GridFilterTypeEnum.RANGE, filter: 2011, filterTo: 2015 },
-  rateFilter: { type: GridFilterTypeEnum.RANGE, filter: 8.0, filterTo: 9.0 },
-});
-console.log(filmList.search());
+console.log(TodoListApp.notes);
+console.log(TodoListApp.searchNotes("Content of note 1"));
+
+console.log(" ");
+
+console.log(TodoListApp.notes);
+console.log(TodoListApp.sortNotes("status"));
+
+console.log(" ");
+
+console.log(TodoListApp.notes);
+console.log(TodoListApp.sortNotes("date"));
+
+console.log(" ");
+
+console.log(TodoListApp.notes);
+console.log(TodoListApp.getNumberOfUncompletedNotes());
+
+console.log(" ");
+
+console.log(TodoListApp.getNumberOfNotes());
+TodoListApp.removeNote("Note 4");
+console.log(TodoListApp.getNumberOfNotes());
+
+console.log(" ");
+
+console.log(TodoListApp.getNoteFullInfo("Note 3"));
+TodoListApp.editNote("Note 3", "NEW!!! Content of note 3");
+console.log(TodoListApp.getNoteFullInfo("Note 3"));
+TodoListApp.markNoteAsCompleted("Note 3");
+console.log(TodoListApp.getNoteFullInfo("Note 3"));
+
+console.log(" ");
+
+console.log(TodoListApp.notes);
+
+console.log(" ");
