@@ -1,12 +1,3 @@
-interface INote {
-  title: string;
-  content: string;
-  dateOfCreation: string;
-  dateOfEditing: string;
-  completedStatus: boolean;
-  requiresConfirmation?: boolean;
-}
-
 const formatDate = (date: Date): string => {
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -16,6 +7,43 @@ const formatDate = (date: Date): string => {
 
   return `${day}.${month}.${year} ${hours}:${minutes}`;
 };
+
+interface INote {
+  title: string;
+  content: string;
+  dateOfCreation: string;
+  dateOfEditing: string;
+  completedStatus: boolean;
+  requiresConfirmation?: boolean;
+  editContent(value: string): void;
+  markNoteAsCompleted(): void;
+}
+
+class Note implements INote {
+  constructor(
+    public title: string,
+    public content: string,
+    public dateOfCreation: string,
+    public dateOfEditing: string,
+    public completedStatus: boolean,
+    public requiresConfirmation?: boolean
+  ) {}
+
+  editContent(newContent: string): void {
+    if (this.requiresConfirmation) {
+      const confirmed = confirm(
+        "This note requires confirmation. Do you want to edit?"
+      );
+      if (!confirmed) return;
+    }
+    this.content = newContent;
+    this.dateOfEditing = formatDate(new Date());
+  }
+
+  markNoteAsCompleted() {
+    this.completedStatus = true;
+  }
+}
 
 class TodoList {
   constructor(private _notes: INote[] = []) {}
@@ -53,14 +81,7 @@ class TodoList {
   editNote(title: string, updatedContent: string): void {
     this._notes.forEach((note) => {
       if (note.title === title) {
-        if (note.requiresConfirmation) {
-          const confirmed = confirm(
-            "This note requires confirmation. Do you want to edit?"
-          );
-          if (!confirmed) return;
-        }
-        note.content = updatedContent;
-        note.dateOfEditing = formatDate(new Date());
+        note.editContent(updatedContent);
       }
     });
   }
@@ -79,7 +100,7 @@ class TodoList {
   markNoteAsCompleted(title: string): void {
     this._notes.forEach((note) => {
       if (note.title === title) {
-        note.completedStatus = true;
+        note.markNoteAsCompleted();
       }
     });
   }
@@ -120,55 +141,55 @@ const getRandomDate = (): Date => {
 };
 
 const myNotes = [
-  {
-    title: "Note 1",
-    content: "Content of note 1",
-    dateOfCreation: formatDate(getRandomDate()),
-    dateOfEditing: formatDate(getRandomDate()),
-    completedStatus: false,
-  },
-  {
-    title: "Note 2",
-    content: "Content of note 2",
-    dateOfCreation: formatDate(getRandomDate()),
-    dateOfEditing: formatDate(getRandomDate()),
-    completedStatus: true,
-  },
-  {
-    title: "Note 3",
-    content: "Content of note 3",
-    dateOfCreation: formatDate(getRandomDate()),
-    dateOfEditing: formatDate(getRandomDate()),
-    completedStatus: false,
-  },
-  {
-    title: "Note 4",
-    content: "Content of note 4",
-    dateOfCreation: formatDate(getRandomDate()),
-    dateOfEditing: formatDate(getRandomDate()),
-    completedStatus: true,
-  },
-  {
-    title: "Note 5",
-    content: "Content of note 5",
-    dateOfCreation: formatDate(getRandomDate()),
-    dateOfEditing: formatDate(getRandomDate()),
-    completedStatus: false,
-  },
-  {
-    title: "Note 6",
-    content: "Content of note 6",
-    dateOfCreation: formatDate(getRandomDate()),
-    dateOfEditing: formatDate(getRandomDate()),
-    completedStatus: true,
-  },
-  {
-    title: "Note 7",
-    content: "Content of note 7",
-    dateOfCreation: formatDate(getRandomDate()),
-    dateOfEditing: formatDate(getRandomDate()),
-    completedStatus: false,
-  },
+  new Note(
+    "Note 1",
+    "Content of note 1",
+    formatDate(getRandomDate()),
+    formatDate(getRandomDate()),
+    false
+  ),
+  new Note(
+    "Note 2",
+    "Content of note 2",
+    formatDate(getRandomDate()),
+    formatDate(getRandomDate()),
+    true
+  ),
+  new Note(
+    "Note 3",
+    "Content of note 3",
+    formatDate(getRandomDate()),
+    formatDate(getRandomDate()),
+    false
+  ),
+  new Note(
+    "Note 4",
+    "Content of note 4",
+    formatDate(getRandomDate()),
+    formatDate(getRandomDate()),
+    true
+  ),
+  new Note(
+    "Note 5",
+    "Content of note 5",
+    formatDate(getRandomDate()),
+    formatDate(getRandomDate()),
+    false
+  ),
+  new Note(
+    "Note 6",
+    "Content of note 6",
+    formatDate(getRandomDate()),
+    formatDate(getRandomDate()),
+    true
+  ),
+  new Note(
+    "Note 7",
+    "Content of note 7",
+    formatDate(getRandomDate()),
+    formatDate(getRandomDate()),
+    false
+  ),
 ];
 
 TodoListApp.addNote(myNotes);
