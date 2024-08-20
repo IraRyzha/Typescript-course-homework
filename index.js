@@ -6,6 +6,23 @@ var formatDate = function (date) {
     var minutes = String(date.getMinutes()).padStart(2, "0");
     return "".concat(day, ".").concat(month, ".").concat(year, " ").concat(hours, ":").concat(minutes);
 };
+var Note = /** @class */ (function () {
+    function Note(title, content, dateOfCreation, dateOfEditing, completedStatus) {
+        this.title = title;
+        this.content = content;
+        this.dateOfCreation = dateOfCreation;
+        this.dateOfEditing = dateOfEditing;
+        this.completedStatus = completedStatus;
+    }
+    Note.prototype.editContent = function (newContent) {
+        this.content = newContent;
+        this.dateOfEditing = formatDate(new Date());
+    };
+    Note.prototype.markNoteAsCompleted = function () {
+        this.completedStatus = true;
+    };
+    return Note;
+}());
 var TodoList = /** @class */ (function () {
     function TodoList(_notes) {
         if (_notes === void 0) { _notes = []; }
@@ -43,15 +60,9 @@ var TodoList = /** @class */ (function () {
         this._notes = this._notes.filter(function (note) { return note.title !== title; });
     };
     TodoList.prototype.editNote = function (title, updatedContent) {
-        this._notes.forEach(function (note) {
+        this._notes.find(function (note) {
             if (note.title === title) {
-                if (note.requiresConfirmation) {
-                    var confirmed = confirm("This note requires confirmation. Do you want to edit?");
-                    if (!confirmed)
-                        return;
-                }
-                note.content = updatedContent;
-                note.dateOfEditing = formatDate(new Date());
+                note.editContent(updatedContent);
             }
         });
     };
@@ -59,10 +70,10 @@ var TodoList = /** @class */ (function () {
         var selectedNote = this._notes.find(function (note) { return note.title === title; });
         return "\n      Title: ".concat(selectedNote === null || selectedNote === void 0 ? void 0 : selectedNote.title, ",\n      Content: ").concat(selectedNote === null || selectedNote === void 0 ? void 0 : selectedNote.content, ", \n      Date of creation: ").concat(selectedNote === null || selectedNote === void 0 ? void 0 : selectedNote.dateOfCreation, ",\n      Date of editing: ").concat(selectedNote === null || selectedNote === void 0 ? void 0 : selectedNote.dateOfEditing, ",\n      Is completed: ").concat(selectedNote === null || selectedNote === void 0 ? void 0 : selectedNote.completedStatus, " \n    ");
     };
-    TodoList.prototype.markNoteAsCompleted = function (title) {
+    TodoList.prototype.markNoteAsCompleted = function (title, isAllowToEdit) {
         this._notes.forEach(function (note) {
             if (note.title === title) {
-                note.completedStatus = true;
+                isAllowToEdit && note.markNoteAsCompleted();
             }
         });
     };
@@ -93,55 +104,13 @@ var getRandomDate = function () {
     return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 };
 var myNotes = [
-    {
-        title: "Note 1",
-        content: "Content of note 1",
-        dateOfCreation: formatDate(getRandomDate()),
-        dateOfEditing: formatDate(getRandomDate()),
-        completedStatus: false,
-    },
-    {
-        title: "Note 2",
-        content: "Content of note 2",
-        dateOfCreation: formatDate(getRandomDate()),
-        dateOfEditing: formatDate(getRandomDate()),
-        completedStatus: true,
-    },
-    {
-        title: "Note 3",
-        content: "Content of note 3",
-        dateOfCreation: formatDate(getRandomDate()),
-        dateOfEditing: formatDate(getRandomDate()),
-        completedStatus: false,
-    },
-    {
-        title: "Note 4",
-        content: "Content of note 4",
-        dateOfCreation: formatDate(getRandomDate()),
-        dateOfEditing: formatDate(getRandomDate()),
-        completedStatus: true,
-    },
-    {
-        title: "Note 5",
-        content: "Content of note 5",
-        dateOfCreation: formatDate(getRandomDate()),
-        dateOfEditing: formatDate(getRandomDate()),
-        completedStatus: false,
-    },
-    {
-        title: "Note 6",
-        content: "Content of note 6",
-        dateOfCreation: formatDate(getRandomDate()),
-        dateOfEditing: formatDate(getRandomDate()),
-        completedStatus: true,
-    },
-    {
-        title: "Note 7",
-        content: "Content of note 7",
-        dateOfCreation: formatDate(getRandomDate()),
-        dateOfEditing: formatDate(getRandomDate()),
-        completedStatus: false,
-    },
+    new Note("Note 1", "Content of note 1", formatDate(getRandomDate()), formatDate(getRandomDate()), false),
+    new Note("Note 2", "Content of note 2", formatDate(getRandomDate()), formatDate(getRandomDate()), true),
+    new Note("Note 3", "Content of note 3", formatDate(getRandomDate()), formatDate(getRandomDate()), false),
+    new Note("Note 4", "Content of note 4", formatDate(getRandomDate()), formatDate(getRandomDate()), true),
+    new Note("Note 5", "Content of note 5", formatDate(getRandomDate()), formatDate(getRandomDate()), false),
+    new Note("Note 6", "Content of note 6", formatDate(getRandomDate()), formatDate(getRandomDate()), true),
+    new Note("Note 7", "Content of note 7", formatDate(getRandomDate()), formatDate(getRandomDate()), false),
 ];
 TodoListApp.addNote(myNotes);
 console.log(TodoListApp.notes);
@@ -163,7 +132,7 @@ console.log(" ");
 console.log(TodoListApp.getNoteFullInfo("Note 3"));
 TodoListApp.editNote("Note 3", "NEW!!! Content of note 3");
 console.log(TodoListApp.getNoteFullInfo("Note 3"));
-TodoListApp.markNoteAsCompleted("Note 3");
+TodoListApp.markNoteAsCompleted("Note 3", true);
 console.log(TodoListApp.getNoteFullInfo("Note 3"));
 console.log(" ");
 console.log(TodoListApp.notes);

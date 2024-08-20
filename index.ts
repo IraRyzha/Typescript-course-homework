@@ -14,7 +14,6 @@ interface INote {
   dateOfCreation: string;
   dateOfEditing: string;
   completedStatus: boolean;
-  requiresConfirmation?: boolean;
   editContent(value: string): void;
   markNoteAsCompleted(): void;
 }
@@ -25,17 +24,10 @@ class Note implements INote {
     public content: string,
     public dateOfCreation: string,
     public dateOfEditing: string,
-    public completedStatus: boolean,
-    public requiresConfirmation?: boolean
+    public completedStatus: boolean
   ) {}
 
   editContent(newContent: string): void {
-    if (this.requiresConfirmation) {
-      const confirmed = confirm(
-        "This note requires confirmation. Do you want to edit?"
-      );
-      if (!confirmed) return;
-    }
     this.content = newContent;
     this.dateOfEditing = formatDate(new Date());
   }
@@ -79,7 +71,7 @@ class TodoList {
   }
 
   editNote(title: string, updatedContent: string): void {
-    this._notes.forEach((note) => {
+    this._notes.find((note) => {
       if (note.title === title) {
         note.editContent(updatedContent);
       }
@@ -97,10 +89,10 @@ class TodoList {
     `;
   }
 
-  markNoteAsCompleted(title: string): void {
+  markNoteAsCompleted(title: string, isAllowToEdit: boolean): void {
     this._notes.forEach((note) => {
       if (note.title === title) {
-        note.markNoteAsCompleted();
+        isAllowToEdit && note.markNoteAsCompleted();
       }
     });
   }
@@ -223,7 +215,7 @@ console.log(" ");
 console.log(TodoListApp.getNoteFullInfo("Note 3"));
 TodoListApp.editNote("Note 3", "NEW!!! Content of note 3");
 console.log(TodoListApp.getNoteFullInfo("Note 3"));
-TodoListApp.markNoteAsCompleted("Note 3");
+TodoListApp.markNoteAsCompleted("Note 3", true);
 console.log(TodoListApp.getNoteFullInfo("Note 3"));
 
 console.log(" ");
